@@ -12,7 +12,7 @@ export const io = new Server(server, {
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"]
   },
-  transports: ["websocket", "polling"] // Added transports for better compatibility
+  transports: ["websocket", "polling"] 
 });
 
 io.on("connection", (socket) => {
@@ -24,7 +24,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", async (data: { roomId: string; message: string; sender: string }) => {
-    console.log("📨 Received message:", data);
+    console.log("Received message:", data);
     
     try {
       const savedMessage = await saveMessage(data.roomId, data.sender, data.message);
