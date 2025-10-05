@@ -24,8 +24,6 @@ const generateAccessAndRefreshToken = async (userId: string) => {
   const refreshToken = user.generateRefreshToken();
   const accessToken = user.generateAccessToken();
 
-  user.refreshToken = refreshToken;
-  await user.save({ validateBeforeSave: false });
 
   return { refreshToken, accessToken };
 };
@@ -62,14 +60,12 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const user = await User.create({ fullName, email, password });
-
-  const userSafe = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
+  const safeUser = user.toObject();
+  delete (safeUser as any).password;
 
   return res
     .status(201)
-    .json(new ApiResponse(201, userSafe, "User registered successfully"));
+    .json(new ApiResponse(201, safeUser, "User registered successfully"));
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
