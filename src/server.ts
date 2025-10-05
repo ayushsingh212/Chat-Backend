@@ -7,11 +7,13 @@ const server = http.createServer(app);
 
 export const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     methods: ["GET", "POST"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"]
   },
+  transports: ["websocket", "polling"] // Added transports for better compatibility
 });
-
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
@@ -22,16 +24,26 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", async (data: { roomId: string; message: string; sender: string }) => {
-    console.log("I am working for the send message")
-    const savedMessage = await saveMessage(data.roomId, data.sender, data.message);
+    console.log("📨 Received message:", data);
+    
+    try {
+      const savedMessage = await saveMessage(data.roomId, data.sender, data.message);
 
-    socket.to(data.roomId).emit("receiveMessage", savedMessage);
-
-    socket.emit("messageSent", savedMessage);
+      io.to(data.roomId).emit("receiveMessage", savedMessage);
+      
+    } catch (error) {
+      console.error("Error saving message:", error);
+      
+      socket.emit("messageError", { error: "Failed to save message" });
+    }
   });
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
+  socket.on("disconnect", (reason) => {
+    console.log("Client disconnected:", socket.id, "Reason:", reason);
+  });
+
+  socket.on("error", (error) => {
+    console.error("Socket error:", error);
   });
 });
 

@@ -6,6 +6,9 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 // Create a new room
 const createRoom = asyncHandler(async (req: Request, res: Response) => {
+  
+  console.log("I have been hitted at the createRoom")
+
   const { name } = req.body as { name: string };
 
   if (!name || name.trim() === "") {

@@ -3,19 +3,15 @@ import cors from "cors";
 import cookieParser from "cookie-parser"
 import allRoutes from "./routes/index.js"
 
-
-
-
 const app = express();
 
-
-
-
-
+// CORS configuration - FIXED
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Specific origin instead of "*"
+    credentials: true, // This now works with specific origin
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
   })
 );
 
@@ -27,7 +23,7 @@ app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 app.use(cookieParser());
 
 // Routes
-app.use("/api",allRoutes)
+app.use("/api", allRoutes);
 
 // Global error handler
 app.use(
