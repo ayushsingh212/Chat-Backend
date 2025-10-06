@@ -6,14 +6,27 @@ import { setupSwagger } from "./utils/swagger.js";
 const app = express();
 
 // CORS configuration - FIXED
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://chat-frontend-b705.onrender.com",
+  "http://localhost:5173"
+];
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Specific origin instead of "*"
-    credentials: true, // This now works with specific origin
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
+
 
 // Body parsers
 app.use(express.json({ limit: "1mb" }));
