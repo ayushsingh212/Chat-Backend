@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"
 import allRoutes from "./routes/index.js"
-
+import { setupSwagger } from "./utils/swagger.js";
 const app = express();
 
 // CORS configuration - FIXED
@@ -42,5 +42,6 @@ app.use(
     });
   }
 );
+setupSwagger(app);
 
 export default app;
